@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { Download, Calendar as CalendarIcon } from 'lucide-react';
+import { Download, Calendar as CalendarIcon, Edit2, X } from 'lucide-react';
 import { format } from 'date-fns';
 import jsPDF from 'jspdf';
 import Papa from 'papaparse';
@@ -9,6 +9,8 @@ import Papa from 'papaparse';
 const Reports = () => {
     const [attendance, setAttendance] = useState<any[]>([]);
     const [filterDate, setFilterDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+    const [editingRecord, setEditingRecord] = useState<any>(null);
+    const [editStatus, setEditStatus] = useState<string>('');
 
     useEffect(() => {
         fetchAttendance();
@@ -34,9 +36,11 @@ const Reports = () => {
             'Name': record.name,
             'Department': record.department,
             'Year': record.year,
+            'Subject': record.subject_name ? `${record.subject_name} (${record.subject_code})` : 'N/A',
             'Date': format(new Date(record.attendance_date), 'yyyy-MM-dd'),
             'Time': record.attendance_time,
-            'Status': record.status
+            'Status': record.status,
+            'Method': record.verification_method || 'Face Match'
         }));
         
         const csv = Papa.unparse(csvData);
@@ -60,8 +64,9 @@ const Reports = () => {
         let y = 35;
         doc.text('Roll No', 14, y);
         doc.text('Name', 50, y);
-        doc.text('Department', 110, y);
-        doc.text('Time', 160, y);
+        doc.text('Subject', 100, y);
+        doc.text('Department', 140, y);
+        doc.text('Time', 180, y);
         
         y += 10;
         doc.setTextColor(0);
@@ -73,12 +78,30 @@ const Reports = () => {
             }
             doc.text(record.roll_no.toString(), 14, y);
             doc.text(record.name, 50, y);
-            doc.text(record.department, 110, y);
-            doc.text(record.attendance_time, 160, y);
+            doc.text(record.subject_name || 'N/A', 100, y);
+            doc.text(record.department, 140, y);
+            doc.text(record.attendance_time, 180, y);
             y += 10;
         });
 
         doc.save(`attendance_${filterDate}.pdf`);
+    };
+
+    const handleSaveEdit = async () => {
+        if (!editingRecord) return;
+        try {
+            const token = localStorage.getItem('token');
+            await axios.put(`http://localhost:5000/api/attendance/${editingRecord.id}`, {
+                status: editStatus
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            toast.success('Attendance updated successfully');
+            setEditingRecord(null);
+            fetchAttendance();
+        } catch (error) {
+            toast.error('Failed to update attendance');
+        }
     };
 
     return (
@@ -123,8 +146,11 @@ const Reports = () => {
                             <th className="px-6 py-4 text-sm font-medium text-slate-400">Time</th>
                             <th className="px-6 py-4 text-sm font-medium text-slate-400">Roll No</th>
                             <th className="px-6 py-4 text-sm font-medium text-slate-400">Name</th>
+                            <th className="px-6 py-4 text-sm font-medium text-slate-400">Subject</th>
                             <th className="px-6 py-4 text-sm font-medium text-slate-400">Department</th>
+                            <th className="px-6 py-4 text-sm font-medium text-slate-400">Method</th>
                             <th className="px-6 py-4 text-sm font-medium text-slate-400">Status</th>
+                            <th className="px-6 py-4 text-sm font-medium text-slate-400">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -134,13 +160,27 @@ const Reports = () => {
                                     <td className="px-6 py-4 text-slate-400">{record.attendance_time}</td>
                                     <td className="px-6 py-4 text-slate-300 font-medium">{record.roll_no}</td>
                                     <td className="px-6 py-4 text-slate-200">{record.name}</td>
+                                    <td className="px-6 py-4 text-slate-300">{record.subject_name ? `${record.subject_name} (${record.subject_code})` : '-'}</td>
                                     <td className="px-6 py-4 text-slate-400">{record.department}</td>
+                                    <td className="px-6 py-4 text-slate-400 text-xs">{record.verification_method || 'Face Match'}</td>
                                     <td className="px-6 py-4">
                                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                            record.status === 'Present' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                                            record.status === 'Present' ? 'bg-green-500/20 text-green-400' : 
+                                            record.status === 'Late' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'
                                         }`}>
                                             {record.status}
                                         </span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <button 
+                                            onClick={() => {
+                                                setEditingRecord(record);
+                                                setEditStatus(record.status);
+                                            }}
+                                            className="p-2 text-blue-400 hover:bg-blue-400/10 rounded-lg transition-colors"
+                                        >
+                                            <Edit2 size={16} />
+                                        </button>
                                     </td>
                                 </tr>
                             ))
@@ -154,6 +194,50 @@ const Reports = () => {
                     </tbody>
                 </table>
             </div>
+
+            {/* Edit Modal */}
+            {editingRecord && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-slate-800 p-6 rounded-2xl w-full max-w-md border border-slate-700 shadow-2xl relative">
+                        <button 
+                            onClick={() => setEditingRecord(null)}
+                            className="absolute top-4 right-4 text-slate-400 hover:text-slate-200"
+                        >
+                            <X size={20} />
+                        </button>
+                        <h2 className="text-xl font-bold text-slate-100 mb-4">Edit Attendance</h2>
+                        <p className="text-slate-400 mb-4">Editing for {editingRecord.name} ({editingRecord.roll_no})</p>
+                        
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-slate-300 mb-2">Status</label>
+                            <select 
+                                className="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 outline-none focus:border-blue-500"
+                                value={editStatus}
+                                onChange={(e) => setEditStatus(e.target.value)}
+                            >
+                                <option value="Present">Present</option>
+                                <option value="Absent">Absent</option>
+                                <option value="Late">Late</option>
+                            </select>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <button 
+                                onClick={handleSaveEdit}
+                                className="flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-colors"
+                            >
+                                Save Changes
+                            </button>
+                            <button 
+                                onClick={() => setEditingRecord(null)}
+                                className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-xl font-medium transition-colors"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

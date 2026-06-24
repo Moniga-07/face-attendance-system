@@ -1,17 +1,24 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, UserPlus, FileText, Camera, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, UserPlus, FileText, Camera, LogOut, UserCircle } from 'lucide-react';
 
 const Layout = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const navigation = [
-        { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-        { name: 'Students', href: '/students', icon: Users },
-        { name: 'Register Student', href: '/students/register', icon: UserPlus },
-        { name: 'Live Attendance', href: '/live', icon: Camera },
-        { name: 'Reports', href: '/reports', icon: FileText },
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
+    const role = user?.role || 'admin'; // fallback to admin if not set
+
+    let navigation = [
+        { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['admin'] },
+        { name: 'Students', href: '/students', icon: Users, roles: ['admin'] },
+        { name: 'Register Student', href: '/students/register', icon: UserPlus, roles: ['admin'] },
+        { name: 'Live Attendance', href: '/live', icon: Camera, roles: ['admin', 'faculty'] },
+        { name: 'Reports', href: '/reports', icon: FileText, roles: ['admin', 'faculty'] },
+        { name: 'Management', href: '/management', icon: Users, roles: ['admin'] },
     ];
+
+    navigation = navigation.filter(item => item.roles.includes(role));
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -48,7 +55,18 @@ const Layout = () => {
                         );
                     })}
                 </nav>
-                <div className="p-4 border-t border-slate-200/50">
+                <div className="p-4 border-t border-slate-200/50 space-y-2">
+                    <Link
+                        to="/profile"
+                        className={`flex items-center space-x-3 px-4 py-3 w-full rounded-xl transition-colors ${
+                            location.pathname === '/profile' 
+                                ? 'bg-blue-100 text-blue-700' 
+                                : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'
+                        }`}
+                    >
+                        <UserCircle size={20} />
+                        <span>User Profile</span>
+                    </Link>
                     <button
                         onClick={handleLogout}
                         className="flex items-center space-x-3 px-4 py-3 w-full rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors"
@@ -66,9 +84,9 @@ const Layout = () => {
                         {navigation.find(n => n.href === location.pathname)?.name || 'Dashboard'}
                     </h2>
                     <div className="flex items-center space-x-4">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-violet-500 flex items-center justify-center text-sm font-bold">
+                        <Link to="/profile" className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-violet-500 flex items-center justify-center text-sm font-bold text-white hover:opacity-80 transition-opacity">
                             A
-                        </div>
+                        </Link>
                     </div>
                 </header>
                 <main className="flex-1 overflow-auto p-8 relative">

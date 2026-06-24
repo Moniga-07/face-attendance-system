@@ -1,12 +1,6 @@
 const jwt = require('jsonwebtoken');
 
 const protect = (req, res, next) => {
-    // Bypass authentication for development mode
-    req.admin = { id: 1, username: 'admin' };
-    return next();
-
-    // Original auth logic commented out for bypass:
-    /*
     let token;
 
     if (
@@ -16,7 +10,7 @@ const protect = (req, res, next) => {
         try {
             token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            req.admin = decoded;
+            req.user = decoded; // { id, username, role }
             next();
         } catch (error) {
             console.error(error);
@@ -27,7 +21,6 @@ const protect = (req, res, next) => {
     if (!token) {
         res.status(401).json({ message: 'Not authorized, no token' });
     }
-    */
 };
 
 module.exports = { protect };

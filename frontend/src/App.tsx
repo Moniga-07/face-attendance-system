@@ -8,9 +8,11 @@ import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import LiveAttendance from './pages/LiveAttendance';
-import Students from './pages/Students';
 import RegisterStudent from './pages/RegisterStudent';
 import Reports from './pages/Reports';
+import AdminManagement from './pages/AdminManagement';
+import UserProfile from './pages/UserProfile';
+import Students from './pages/Students';
 
 import React from 'react';
 
@@ -45,6 +47,8 @@ function App() {
                     <Route path="students" element={<Students />} />
                     <Route path="students/register" element={<RegisterStudent />} />
                     <Route path="reports" element={<Reports />} />
+                    <Route path="management" element={<AdminManagement />} />
+                    <Route path="profile" element={<UserProfile />} />
                 </Route>
             </Routes>
         </Router>

@@ -6,12 +6,12 @@ const { protect } = require('../middleware/authMiddleware');
 // @route   POST /api/attendance
 // @desc    Mark attendance (unprotected to allow kiosk mode)
 router.post('/', async (req, res) => {
-    const { student_id, attendance_date, attendance_time } = req.body;
+    const { student_id, subject_id, attendance_date, attendance_time } = req.body;
 
     try {
         await pool.query(
-            'INSERT INTO attendance (student_id, attendance_date, attendance_time, status) VALUES (?, ?, ?, ?)',
-            [student_id, attendance_date, attendance_time, 'Present']
+            'INSERT INTO attendance (student_id, subject_id, attendance_date, attendance_time, status) VALUES (?, ?, ?, ?, ?)',
+            [student_id, subject_id || null, attendance_date, attendance_time, 'Present']
         );
         
         // Fetch student name for the response
@@ -21,7 +21,7 @@ router.post('/', async (req, res) => {
         res.status(201).json({ message: 'Attendance marked successfully', name: studentName });
     } catch (error) {
         if (error.code === 'ER_DUP_ENTRY') {
-            return res.status(400).json({ message: 'Attendance already marked for today' });
+            return res.status(400).json({ message: 'Attendance already marked for this subject today' });
         }
         console.error(error);
         res.status(500).json({ message: 'Server error' });
@@ -31,28 +31,52 @@ router.post('/', async (req, res) => {
 // @route   GET /api/attendance
 // @desc    Get attendance records (with filters)
 router.get('/', protect, async (req, res) => {
-    const { date, startDate, endDate } = req.query;
+    const { date, startDate, endDate, subject_id } = req.query;
     
     try {
         let query = `
-            SELECT a.id, a.attendance_date, a.attendance_time, a.status, s.roll_no, s.name, s.department, s.year 
+            SELECT a.id, a.attendance_date, a.attendance_time, a.status, a.verification_method, s.roll_no, s.name, s.department, s.year,
+                   sub.name as subject_name, sub.subject_code 
             FROM attendance a 
             JOIN students s ON a.student_id = s.id
+            LEFT JOIN subjects sub ON a.subject_id = sub.id
+            WHERE 1=1
         `;
         const params = [];
 
         if (date) {
-            query += ' WHERE a.attendance_date = ?';
+            query += ' AND a.attendance_date = ?';
             params.push(date);
         } else if (startDate && endDate) {
-            query += ' WHERE a.attendance_date BETWEEN ? AND ?';
+            query += ' AND a.attendance_date BETWEEN ? AND ?';
             params.push(startDate, endDate);
+        }
+
+        if (subject_id) {
+            query += ' AND a.subject_id = ?';
+            params.push(subject_id);
         }
 
         query += ' ORDER BY a.attendance_date DESC, a.attendance_time DESC';
 
         const [rows] = await pool.query(query, params);
         res.json(rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// @route   PUT /api/attendance/:id
+// @desc    Update attendance status (Manual Override)
+router.put('/:id', protect, async (req, res) => {
+    const { status } = req.body;
+    try {
+        await pool.query(
+            'UPDATE attendance SET status = ?, verification_method = ? WHERE id = ?',
+            [status, 'Manual Override', req.params.id]
+        );
+        res.json({ message: 'Attendance updated successfully' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });

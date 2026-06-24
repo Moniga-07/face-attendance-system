@@ -67,6 +67,7 @@ const Students = () => {
                             <th className="px-6 py-4 text-sm font-medium text-slate-400">Roll No</th>
                             <th className="px-6 py-4 text-sm font-medium text-slate-400">Name</th>
                             <th className="px-6 py-4 text-sm font-medium text-slate-400">Department</th>
+                            <th className="px-6 py-4 text-sm font-medium text-slate-400">Course</th>
                             <th className="px-6 py-4 text-sm font-medium text-slate-400">Year</th>
                             <th className="px-6 py-4 text-sm font-medium text-slate-400 text-right">Actions</th>
                         </tr>
@@ -78,6 +79,7 @@ const Students = () => {
                                     <td className="px-6 py-4 text-slate-300 font-medium">{student.roll_no}</td>
                                     <td className="px-6 py-4 text-slate-200">{student.name}</td>
                                     <td className="px-6 py-4 text-slate-400">{student.department}</td>
+                                    <td className="px-6 py-4 text-slate-400">{student.course || '-'}</td>
                                     <td className="px-6 py-4 text-slate-400">{student.year}</td>
                                     <td className="px-6 py-4 flex justify-end gap-3">
                                         <button className="p-2 text-blue-400 hover:bg-blue-400/10 rounded-lg transition-colors cursor-not-allowed opacity-50" title="Edit coming soon">

@@ -12,6 +12,9 @@ const LiveAttendance = () => {
     const [studentsLoaded, setStudentsLoaded] = useState(false);
     const [faceMatcher, setFaceMatcher] = useState<faceapi.FaceMatcher | null>(null);
     const [studentMap, setStudentMap] = useState<Map<string, any>>(new Map());
+    const [subjects, setSubjects] = useState<any[]>([]);
+    const [selectedSubject, setSelectedSubject] = useState<string>('');
+    const [profile, setProfile] = useState<any>(null);
     
     // Cooldown to prevent spamming backend for the same person
     const lastRecognizedRef = useRef<{ id: string, time: number } | null>(null);
@@ -43,6 +46,29 @@ const LiveAttendance = () => {
                     setFaceMatcher(new faceapi.FaceMatcher(labeledDescriptors, 0.45));
                 }
                 setStudentsLoaded(true);
+
+                // Fetch Subjects
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const subRes = await axios.get('http://localhost:5000/api/subjects/my-subjects', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    setSubjects(subRes.data);
+                }
+                // Fetch Profile Defaults
+                if (token) {
+                    try {
+                        const profRes = await axios.get('http://localhost:5000/api/users/profile', {
+                            headers: { Authorization: `Bearer ${token}` }
+                        });
+                        setProfile(profRes.data);
+                        if (profRes.data && profRes.data.course_code) {
+                            setSelectedSubject(profRes.data.course_code);
+                        }
+                    } catch (e) {
+                        console.log('No profile defaults found or error fetching profile');
+                    }
+                }
             } catch (error) {
                 console.error(error);
                 toast.error('Failed to initialize attendance system');
@@ -54,7 +80,7 @@ const LiveAttendance = () => {
 
     useEffect(() => {
         let stream: MediaStream | null = null;
-        if (modelsLoaded && studentsLoaded) {
+        if (modelsLoaded && studentsLoaded && selectedSubject) {
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then((currentStream) => {
                     stream = currentStream;
@@ -76,7 +102,7 @@ const LiveAttendance = () => {
                 clearInterval(recognitionLoopRef.current);
             }
         };
-    }, [modelsLoaded, studentsLoaded]);
+    }, [modelsLoaded, studentsLoaded, selectedSubject]);
 
     const handleVideoPlay = () => {
         if (!videoRef.current || !canvasRef.current || !faceMatcher) return;
@@ -128,6 +154,7 @@ const LiveAttendance = () => {
                             try {
                                 await axios.post('http://localhost:5000/api/attendance', {
                                     student_id: bestMatch.label,
+                                    subject_id: selectedSubject,
                                     attendance_date,
                                     attendance_time
                                 });
@@ -182,9 +209,29 @@ const LiveAttendance = () => {
 
             <div className="w-full max-w-4xl p-6 glass rounded-3xl flex flex-col items-center border border-slate-700/50 shadow-2xl">
                 <h1 className="text-3xl font-bold text-slate-100 mb-2">Live Attendance Scanner</h1>
-                <p className="text-slate-400 mb-8">Please look directly at the camera</p>
+                <p className="text-slate-400 mb-6">Please look directly at the camera</p>
 
-                {(!modelsLoaded || !studentsLoaded) ? (
+                {subjects.length > 0 && !profile?.course_code && (
+                    <div className="mb-6 w-full max-w-md">
+                        <label className="block text-sm font-medium text-slate-300 mb-2 text-center">Select Subject</label>
+                        <select 
+                            className="w-full p-3 bg-slate-800 text-slate-100 border border-slate-700 rounded-xl outline-none focus:border-blue-500"
+                            value={selectedSubject}
+                            onChange={(e) => setSelectedSubject(e.target.value)}
+                        >
+                            <option value="">-- Choose Subject --</option>
+                            {subjects.map(s => (
+                                <option key={s.id} value={s.id}>{s.name} ({s.subject_code})</option>
+                            ))}
+                        </select>
+                    </div>
+                )}
+
+                {(!selectedSubject && subjects.length > 0) ? (
+                    <div className="w-full aspect-video bg-slate-800/50 rounded-2xl flex flex-col items-center justify-center text-slate-400 border border-slate-700 shadow-inner">
+                        <p className="text-lg font-medium text-slate-300">Please select a subject to start camera</p>
+                    </div>
+                ) : (!modelsLoaded || !studentsLoaded) ? (
                     <div className="w-full aspect-video bg-slate-800/50 rounded-2xl flex flex-col items-center justify-center text-slate-400 border border-slate-700 shadow-inner">
                         <Loader2 className="animate-spin mb-4 text-blue-500" size={48} />
                         <p className="text-lg font-medium text-slate-300">Initializing System...</p>

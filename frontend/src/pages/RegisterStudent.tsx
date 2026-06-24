@@ -17,7 +17,8 @@ const RegisterStudent = () => {
         roll_no: '',
         name: '',
         department: '',
-        year: ''
+        year: '',
+        course: ''
     });
 
     useEffect(() => {
@@ -183,6 +184,22 @@ const RegisterStudent = () => {
                                 <option value="2nd Year">2nd Year</option>
                                 <option value="3rd Year">3rd Year</option>
                                 <option value="4th Year">4th Year</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-1">Course</label>
+                            <select
+                                required
+                                value={formData.course}
+                                onChange={e => setFormData({...formData, course: e.target.value})}
+                                className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
+                            >
+                                <option value="">Select Course</option>
+                                <option value="ITA0218 - Web technology">ITA0218 - Web technology</option>
+                                <option value="CSE1001 - Programming">CSE1001 - Programming</option>
+                                <option value="ECE2002 - Digital Logic">ECE2002 - Digital Logic</option>
+                                <option value="MGT101 - Management">MGT101 - Management</option>
+                                <option value="ENG101 - English">ENG101 - English</option>
                             </select>
                         </div>
                         

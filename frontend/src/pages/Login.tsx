@@ -18,7 +18,12 @@ const Login = () => {
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data));
             toast.success('Logged in successfully!');
-            navigate('/dashboard');
+            
+            if (data.role === 'faculty') {
+                navigate('/live');
+            } else {
+                navigate('/dashboard');
+            }
         } catch (error: any) {
             toast.error(error.response?.data?.message || 'Login failed');
         } finally {

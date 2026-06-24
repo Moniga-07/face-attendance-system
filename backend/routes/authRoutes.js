@@ -10,23 +10,39 @@ router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        const [rows] = await pool.query('SELECT * FROM admins WHERE username = ?', [username]);
+        let user = null;
+        let role = null;
 
-        if (rows.length === 0) {
+        // Check admins table
+        const [adminRows] = await pool.query('SELECT * FROM admins WHERE username = ?', [username]);
+        
+        if (adminRows.length > 0) {
+            user = adminRows[0];
+            role = 'admin';
+        } else {
+            // Check faculties table
+            const [facultyRows] = await pool.query('SELECT * FROM faculties WHERE username = ?', [username]);
+            if (facultyRows.length > 0) {
+                user = facultyRows[0];
+                role = 'faculty';
+            }
+        }
+
+        if (!user) {
             return res.status(401).json({ message: 'Invalid username or password' });
         }
 
-        const admin = rows[0];
-        const isMatch = await bcrypt.compare(password, admin.password);
+        const isMatch = await bcrypt.compare(password, user.password);
 
         if (isMatch) {
-            const token = jwt.sign({ id: admin.id, username: admin.username }, process.env.JWT_SECRET, {
+            const token = jwt.sign({ id: user.id, username: user.username, role }, process.env.JWT_SECRET, {
                 expiresIn: '30d',
             });
 
             res.json({
-                id: admin.id,
-                username: admin.username,
+                id: user.id,
+                username: user.username,
+                role,
                 token,
             });
         } else {
