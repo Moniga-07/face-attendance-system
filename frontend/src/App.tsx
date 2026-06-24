@@ -18,6 +18,10 @@ import React from 'react';
 
 // Auth Guard
 const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        return <Navigate to="/login" replace />;
+    }
     return children;
 };
 
