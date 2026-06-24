@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-const modelsDir = path.join(__dirname, 'frontend', 'public', 'models');
+const modelsDir = path.join(__dirname, 'src', 'main', 'webapp', 'models');
 
 if (!fs.existsSync(modelsDir)) {
     fs.mkdirSync(modelsDir, { recursive: true });
@@ -18,7 +18,9 @@ const files = [
     'face_landmark_68_model-shard1',
     'face_recognition_model-weights_manifest.json',
     'face_recognition_model-shard1',
-    'face_recognition_model-shard2'
+    'face_recognition_model-shard2',
+    'face_expression_model-weights_manifest.json',
+    'face_expression_model-shard1'
 ];
 
 const downloadFile = (filename) => {

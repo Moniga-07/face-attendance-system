@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://attendance.com/schema"
+           xmlns:att="http://attendance.com/schema"
+           elementFormDefault="qualified">
+
+    <!-- Root Element -->
+    <xs:element name="attendance-report">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="generated-date" type="xs:date"/>
+                <xs:element name="total-records" type="xs:int"/>
+                <xs:element name="records" type="att:RecordsType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Records Container -->
+    <xs:complexType name="RecordsType">
+        <xs:sequence>
+            <xs:element name="record" type="att:RecordType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Single Attendance Record -->
+    <xs:complexType name="RecordType">
+        <xs:sequence>
+            <xs:element name="roll-no" type="xs:string"/>
+            <xs:element name="student-name" type="xs:string"/>
+            <xs:element name="department" type="xs:string"/>
+            <xs:element name="year" type="att:YearType"/>
+            <xs:element name="date" type="xs:date"/>
+            <xs:element name="time" type="xs:time"/>
+            <xs:element name="status" type="att:StatusType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Constrained Types -->
+    <xs:simpleType name="StatusType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Present"/>
+            <xs:enumeration value="Absent"/>
+            <xs:enumeration value="Late"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="YearType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="1st Year"/>
+            <xs:enumeration value="2nd Year"/>
+            <xs:enumeration value="3rd Year"/>
+            <xs:enumeration value="4th Year"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>

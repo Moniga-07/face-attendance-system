@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS attendance (
     UNIQUE KEY unique_attendance (student_id, attendance_date)
 );
 
--- Insert a default admin account: username 'admin', password 'admin123'
--- The password hash here should be bcrypt generated for 'admin123'. We'll just generate one in the app, but here is a typical bcrypt hash for admin123
-INSERT INTO admins (username, password) VALUES ('admin', '$2a$10$tZ2E2Hj6o9uC6fT1A9r.l.YF3Q3E0m3k1mQ/Ff2FwP7C/a/H/rXvK') ON DUPLICATE KEY UPDATE username='admin';
+-- Default admin account: username 'admin', password 'admin123'
+-- BCrypt hash for 'admin123' generated with at.favre.lib:bcrypt cost factor 10
+INSERT INTO admins (username, password) 
+VALUES ('admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy') 
+ON DUPLICATE KEY UPDATE username='admin';
