@@ -20,11 +20,11 @@ const Layout = () => {
     };
 
     return (
-        <div className="flex h-screen bg-slate-900 text-slate-100 font-sans">
+        <div className="flex h-screen bg-blue-50 text-slate-900 font-sans">
             {/* Sidebar */}
-            <div className="w-64 glass border-r border-slate-700/50 flex flex-col">
+            <div className="w-64 glass border-r border-slate-200/50 flex flex-col">
                 <div className="p-6">
-                    <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
+                    <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
                         FaceAuth Admin
                     </h1>
                 </div>
@@ -38,8 +38,8 @@ const Layout = () => {
                                 to={item.href}
                                 className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                                     isActive 
-                                        ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' 
-                                        : 'hover:bg-slate-800/50 text-slate-400 hover:text-slate-200'
+                                        ? 'bg-blue-100 text-blue-700 border border-blue-200' 
+                                        : 'hover:bg-slate-100 text-slate-500 hover:text-slate-800'
                                 }`}
                             >
                                 <Icon size={20} />
@@ -48,10 +48,10 @@ const Layout = () => {
                         );
                     })}
                 </nav>
-                <div className="p-4 border-t border-slate-700/50">
+                <div className="p-4 border-t border-slate-200/50">
                     <button
                         onClick={handleLogout}
-                        className="flex items-center space-x-3 px-4 py-3 w-full rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+                        className="flex items-center space-x-3 px-4 py-3 w-full rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors"
                     >
                         <LogOut size={20} />
                         <span>Logout</span>
@@ -61,8 +61,8 @@ const Layout = () => {
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col overflow-hidden">
-                <header className="h-16 glass border-b border-slate-700/50 flex items-center justify-between px-8">
-                    <h2 className="text-lg font-medium text-slate-200">
+                <header className="h-16 glass border-b border-slate-200/50 flex items-center justify-between px-8">
+                    <h2 className="text-lg font-medium text-slate-800">
                         {navigation.find(n => n.href === location.pathname)?.name || 'Dashboard'}
                     </h2>
                     <div className="flex items-center space-x-4">

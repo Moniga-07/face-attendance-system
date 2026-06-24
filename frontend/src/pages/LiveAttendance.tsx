@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import * as faceapi from 'face-api.js';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';

@@ -12,12 +12,10 @@ import Students from './pages/Students';
 import RegisterStudent from './pages/RegisterStudent';
 import Reports from './pages/Reports';
 
+import React from 'react';
+
 // Auth Guard
-const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        return <Navigate to="/login" replace />;
-    }
+const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
     return children;
 };
 
