@@ -18,8 +18,8 @@ const AdminManagement = () => {
     const fetchData = async () => {
         try {
             const [facRes, subRes] = await Promise.all([
-                axios.get('http://localhost:5000/api/faculties', axiosConfig),
-                axios.get('http://localhost:5000/api/subjects', axiosConfig)
+                axios.get('http://localhost:9090/face-attendance/api/faculties', axiosConfig),
+                axios.get('http://localhost:9090/face-attendance/api/subjects', axiosConfig)
             ]);
             setFaculties(facRes.data);
             setSubjects(subRes.data);
@@ -35,7 +35,7 @@ const AdminManagement = () => {
     const handleCreateFaculty = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/api/faculties', facultyForm, axiosConfig);
+            await axios.post('http://localhost:9090/face-attendance/api/faculties', facultyForm, axiosConfig);
             toast.success('Faculty created');
             setFacultyForm({ username: '', password: '', name: '', department: '' });
             fetchData();
@@ -47,7 +47,7 @@ const AdminManagement = () => {
     const handleCreateSubject = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/api/subjects', subjectForm, axiosConfig);
+            await axios.post('http://localhost:9090/face-attendance/api/subjects', subjectForm, axiosConfig);
             toast.success('Subject created');
             setSubjectForm({ subject_code: '', name: '', department: '', year: '' });
             fetchData();
@@ -62,7 +62,7 @@ const AdminManagement = () => {
             return toast.error('Select both faculty and subject');
         }
         try {
-            await axios.post('http://localhost:5000/api/subjects/assign', assignForm, axiosConfig);
+            await axios.post('http://localhost:9090/face-attendance/api/subjects/assign', assignForm, axiosConfig);
             toast.success('Subject assigned to faculty');
             setAssignForm({ faculty_id: '', subject_id: '' });
         } catch (error: any) {

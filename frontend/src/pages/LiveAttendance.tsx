@@ -32,7 +32,7 @@ const LiveAttendance = () => {
                 setModelsLoaded(true);
 
                 // Fetch Students
-                const { data } = await axios.get('http://localhost:5000/api/students/all-descriptors');
+                const { data } = await axios.get('http://localhost:9090/face-attendance/api/students/all-descriptors');
                 
                 if (data.length > 0) {
                     const map = new Map();
@@ -50,7 +50,7 @@ const LiveAttendance = () => {
                 // Fetch Subjects
                 const token = localStorage.getItem('token');
                 if (token) {
-                    const subRes = await axios.get('http://localhost:5000/api/subjects/my-subjects', {
+                    const subRes = await axios.get('http://localhost:9090/face-attendance/api/subjects/my-subjects', {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     setSubjects(subRes.data);
@@ -58,7 +58,7 @@ const LiveAttendance = () => {
                 // Fetch Profile Defaults
                 if (token) {
                     try {
-                        const profRes = await axios.get('http://localhost:5000/api/users/profile', {
+                        const profRes = await axios.get('http://localhost:9090/face-attendance/api/users/profile', {
                             headers: { Authorization: `Bearer ${token}` }
                         });
                         setProfile(profRes.data);
@@ -152,7 +152,7 @@ const LiveAttendance = () => {
                             const attendance_time = today.toTimeString().split(' ')[0];
 
                             try {
-                                await axios.post('http://localhost:5000/api/attendance', {
+                                await axios.post('http://localhost:9090/face-attendance/api/attendance', {
                                     student_id: bestMatch.label,
                                     subject_id: selectedSubject,
                                     attendance_date,

@@ -14,7 +14,7 @@ const Login = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const { data } = await axios.post('http://localhost:5000/api/auth/login', { username, password });
+            const { data } = await axios.post('http://localhost:9090/face-attendance/api/auth/login', { username, password });
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data));
             toast.success('Logged in successfully!');
@@ -33,7 +33,7 @@ const Login = () => {
 
     const handleSetup = async () => {
         try {
-            await axios.post('http://localhost:5000/api/auth/setup');
+            await axios.post('http://localhost:9090/face-attendance/api/auth/setup');
             toast.success('Default admin created: admin / admin123');
         } catch (error: any) {
             toast.error(error.response?.data?.message || 'Setup failed');

@@ -18,7 +18,7 @@ const UserProfile = () => {
         const fetchProfile = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const { data } = await axios.get('http://localhost:5000/api/users/profile', {
+                const { data } = await axios.get('http://localhost:9090/face-attendance/api/users/profile', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 
@@ -46,7 +46,7 @@ const UserProfile = () => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
-            await axios.put('http://localhost:5000/api/users/profile', formData, {
+            await axios.put('http://localhost:9090/face-attendance/api/users/profile', formData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             toast.success('Profile updated successfully!');

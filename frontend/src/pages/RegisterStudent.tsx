@@ -119,7 +119,7 @@ const RegisterStudent = () => {
             const token = localStorage.getItem('token');
             const descriptorArray = Array.from(faceDescriptor);
             
-            await axios.post('http://localhost:5000/api/students', {
+            await axios.post('http://localhost:9090/face-attendance/api/students', {
                 ...formData,
                 face_descriptor: descriptorArray
             }, {
