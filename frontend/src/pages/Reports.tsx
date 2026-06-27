@@ -19,7 +19,7 @@ const Reports = () => {
     const fetchAttendance = async () => {
         try {
             const token = localStorage.getItem('token');
-            const { data } = await axios.get(`http://localhost:5000/api/attendance?date=${filterDate}`, {
+            const { data } = await axios.get(`http://localhost:9090/face-attendance/api/attendance?date=${filterDate}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setAttendance(data);
@@ -91,7 +91,7 @@ const Reports = () => {
         if (!editingRecord) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:5000/api/attendance/${editingRecord.id}`, {
+            await axios.put(`http://localhost:9090/face-attendance/api/attendance/${editingRecord.id}`, {
                 status: editStatus
             }, {
                 headers: { Authorization: `Bearer ${token}` }

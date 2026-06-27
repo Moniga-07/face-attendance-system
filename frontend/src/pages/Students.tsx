@@ -37,7 +37,7 @@ const Students = () => {
     const fetchStudents = async () => {
         try {
             const token = localStorage.getItem('token');
-            const { data } = await axios.get('http://localhost:5000/api/students', {
+            const { data } = await axios.get('http://localhost:9090/face-attendance/api/students', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setStudents(data);
@@ -51,7 +51,7 @@ const Students = () => {
         
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:5000/api/students/${id}`, {
+            await axios.delete(`http://localhost:9090/face-attendance/api/students/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             toast.success('Student deleted successfully');

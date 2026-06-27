@@ -17,7 +17,7 @@ const Dashboard = () => {
         const fetchStats = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const { data } = await axios.get('http://localhost:5000/api/dashboard/stats', {
+                const { data } = await axios.get('http://localhost:9090/face-attendance/api/dashboard/stats', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setStats(data);

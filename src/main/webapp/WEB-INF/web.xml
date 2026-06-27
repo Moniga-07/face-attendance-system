@@ -41,6 +41,36 @@
         <url-pattern>/api/auth/*</url-pattern>
     </servlet-mapping>
 
+    <!-- User Servlet -->
+    <servlet>
+        <servlet-name>UserServlet</servlet-name>
+        <servlet-class>com.attendance.servlet.UserServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UserServlet</servlet-name>
+        <url-pattern>/api/users/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- Faculty Servlet -->
+    <servlet>
+        <servlet-name>FacultyServlet</servlet-name>
+        <servlet-class>com.attendance.servlet.FacultyServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FacultyServlet</servlet-name>
+        <url-pattern>/api/faculties/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- Subject Servlet -->
+    <servlet>
+        <servlet-name>SubjectServlet</servlet-name>
+        <servlet-class>com.attendance.servlet.SubjectServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SubjectServlet</servlet-name>
+        <url-pattern>/api/subjects/*</url-pattern>
+    </servlet-mapping>
+
     <!-- Student Servlet -->
     <servlet>
         <servlet-name>StudentServlet</servlet-name>
@@ -110,7 +140,19 @@
     </filter>
     <filter-mapping>
         <filter-name>AuthFilter</filter-name>
-        <url-pattern>/api/students</url-pattern>
+        <url-pattern>/api/students/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/api/users/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/api/faculties/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/api/subjects/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>AuthFilter</filter-name>
