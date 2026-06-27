@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { Download, Calendar as CalendarIcon, Edit2, X } from 'lucide-react';
+import { Download, Calendar as CalendarIcon, Edit2, X, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import jsPDF from 'jspdf';
 import Papa from 'papaparse';
@@ -104,6 +104,21 @@ const Reports = () => {
         }
     };
 
+    const handleDelete = async (id: number) => {
+        if (!window.confirm('Are you sure you want to delete this attendance record?')) return;
+        
+        try {
+            const token = localStorage.getItem('token');
+            await axios.delete(`http://localhost:5000/api/attendance/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            toast.success('Attendance deleted successfully');
+            fetchAttendance();
+        } catch (error) {
+            toast.error('Failed to delete attendance record');
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -129,7 +144,7 @@ const Reports = () => {
             <div className="glass p-6 rounded-2xl flex items-center gap-4 border border-slate-700/50">
                 <CalendarIcon className="text-slate-400" />
                 <div className="flex flex-col">
-                    <label className="text-sm text-slate-400 mb-1">Filter by Date</label>
+                    <label className="text-sm font-bold text-slate-900 mb-1">Filter by Date</label>
                     <input 
                         type="date" 
                         value={filterDate}
@@ -142,27 +157,27 @@ const Reports = () => {
             <div className="glass rounded-2xl overflow-hidden border border-slate-700/50">
                 <table className="w-full text-left border-collapse">
                     <thead>
-                        <tr className="bg-slate-800/50 border-b border-slate-700">
-                            <th className="px-6 py-4 text-sm font-medium text-slate-400">Time</th>
-                            <th className="px-6 py-4 text-sm font-medium text-slate-400">Roll No</th>
-                            <th className="px-6 py-4 text-sm font-medium text-slate-400">Name</th>
-                            <th className="px-6 py-4 text-sm font-medium text-slate-400">Subject</th>
-                            <th className="px-6 py-4 text-sm font-medium text-slate-400">Department</th>
-                            <th className="px-6 py-4 text-sm font-medium text-slate-400">Method</th>
-                            <th className="px-6 py-4 text-sm font-medium text-slate-400">Status</th>
-                            <th className="px-6 py-4 text-sm font-medium text-slate-400">Actions</th>
+                        <tr className="bg-white/40 border-b border-slate-300">
+                            <th className="px-6 py-4 text-sm font-bold text-slate-900">Time</th>
+                            <th className="px-6 py-4 text-sm font-bold text-slate-900">Roll No</th>
+                            <th className="px-6 py-4 text-sm font-bold text-slate-900">Name</th>
+                            <th className="px-6 py-4 text-sm font-bold text-slate-900">Subject</th>
+                            <th className="px-6 py-4 text-sm font-bold text-slate-900">Department</th>
+                            <th className="px-6 py-4 text-sm font-bold text-slate-900">Method</th>
+                            <th className="px-6 py-4 text-sm font-bold text-slate-900">Status</th>
+                            <th className="px-6 py-4 text-sm font-bold text-slate-900">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {attendance.length > 0 ? (
                             attendance.map((record) => (
-                                <tr key={record.id} className="border-b border-slate-700/50 hover:bg-slate-800/30 transition-colors">
-                                    <td className="px-6 py-4 text-slate-400">{record.attendance_time}</td>
-                                    <td className="px-6 py-4 text-slate-300 font-medium">{record.roll_no}</td>
-                                    <td className="px-6 py-4 text-slate-200">{record.name}</td>
-                                    <td className="px-6 py-4 text-slate-300">{record.subject_name ? `${record.subject_name} (${record.subject_code})` : '-'}</td>
-                                    <td className="px-6 py-4 text-slate-400">{record.department}</td>
-                                    <td className="px-6 py-4 text-slate-400 text-xs">{record.verification_method || 'Face Match'}</td>
+                                <tr key={record.id} className="border-b border-slate-300 hover:bg-white/50 transition-colors">
+                                    <td className="px-6 py-4 text-slate-700">{record.attendance_time}</td>
+                                    <td className="px-6 py-4 text-slate-900 font-bold">{record.roll_no}</td>
+                                    <td className="px-6 py-4 text-slate-800 font-medium">{record.name}</td>
+                                    <td className="px-6 py-4 text-slate-800">{record.subject_name ? `${record.subject_name} (${record.subject_code})` : '-'}</td>
+                                    <td className="px-6 py-4 text-slate-700">{record.department}</td>
+                                    <td className="px-6 py-4 text-slate-700 text-xs">{record.verification_method || 'Face Match'}</td>
                                     <td className="px-6 py-4">
                                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                                             record.status === 'Present' ? 'bg-green-500/20 text-green-400' : 
@@ -171,15 +186,23 @@ const Reports = () => {
                                             {record.status}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4">
+                                    <td className="px-6 py-4 flex gap-2">
                                         <button 
                                             onClick={() => {
                                                 setEditingRecord(record);
                                                 setEditStatus(record.status);
                                             }}
                                             className="p-2 text-blue-400 hover:bg-blue-400/10 rounded-lg transition-colors"
+                                            title="Edit Attendance"
                                         >
                                             <Edit2 size={16} />
+                                        </button>
+                                        <button 
+                                            onClick={() => handleDelete(record.id)}
+                                            className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
+                                            title="Delete Attendance"
+                                        >
+                                            <Trash2 size={16} />
                                         </button>
                                     </td>
                                 </tr>
@@ -209,7 +232,7 @@ const Reports = () => {
                         <p className="text-slate-400 mb-4">Editing for {editingRecord.name} ({editingRecord.roll_no})</p>
                         
                         <div className="mb-6">
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Status</label>
+                            <label className="block text-sm font-bold text-slate-100 mb-2">Status</label>
                             <select 
                                 className="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 outline-none focus:border-blue-500"
                                 value={editStatus}

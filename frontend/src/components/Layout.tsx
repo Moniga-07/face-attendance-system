@@ -14,8 +14,7 @@ const Layout = () => {
         { name: 'Students', href: '/students', icon: Users, roles: ['admin'] },
         { name: 'Register Student', href: '/students/register', icon: UserPlus, roles: ['admin'] },
         { name: 'Live Attendance', href: '/live', icon: Camera, roles: ['admin', 'faculty'] },
-        { name: 'Reports', href: '/reports', icon: FileText, roles: ['admin', 'faculty'] },
-        { name: 'Management', href: '/management', icon: Users, roles: ['admin'] },
+        { name: 'Reports', href: '/reports', icon: FileText, roles: ['admin', 'faculty'] }
     ];
 
     navigation = navigation.filter(item => item.roles.includes(role));
@@ -84,8 +83,8 @@ const Layout = () => {
                         {navigation.find(n => n.href === location.pathname)?.name || 'Dashboard'}
                     </h2>
                     <div className="flex items-center space-x-4">
-                        <Link to="/profile" className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-violet-500 flex items-center justify-center text-sm font-bold text-white hover:opacity-80 transition-opacity">
-                            A
+                        <Link to="/profile" className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-violet-500 flex items-center justify-center text-white hover:opacity-80 transition-opacity">
+                            <UserCircle size={20} />
                         </Link>
                     </div>
                 </header>

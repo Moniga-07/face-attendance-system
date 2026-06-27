@@ -7,7 +7,7 @@ const { protect } = require('../middleware/authMiddleware');
 // @desc    Get all students
 router.get('/', protect, async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT id, roll_no, name, department, year, created_at FROM students ORDER BY created_at DESC');
+        const [rows] = await pool.query('SELECT id, roll_no, name, department, year, course, created_at FROM students ORDER BY created_at DESC');
         res.json(rows);
     } catch (error) {
         console.error(error);
@@ -35,15 +35,15 @@ router.get('/all-descriptors', async (req, res) => {
 // @route   POST /api/students
 // @desc    Register a new student
 router.post('/', protect, async (req, res) => {
-    const { roll_no, name, department, year, face_descriptor } = req.body;
+    const { roll_no, name, department, year, course, face_descriptor } = req.body;
 
     try {
         // Ensure face_descriptor is stored as JSON string
         const descriptorString = JSON.stringify(face_descriptor);
         
         const [result] = await pool.query(
-            'INSERT INTO students (roll_no, name, department, year, face_descriptor) VALUES (?, ?, ?, ?, ?)',
-            [roll_no, name, department, year, descriptorString]
+            'INSERT INTO students (roll_no, name, department, year, course, face_descriptor) VALUES (?, ?, ?, ?, ?, ?)',
+            [roll_no, name, department, year, course, descriptorString]
         );
 
         res.status(201).json({ message: 'Student registered successfully', id: result.insertId });
@@ -59,11 +59,11 @@ router.post('/', protect, async (req, res) => {
 // @route   PUT /api/students/:id
 // @desc    Update student details
 router.put('/:id', protect, async (req, res) => {
-    const { roll_no, name, department, year } = req.body;
+    const { roll_no, name, department, year, course } = req.body;
     try {
         await pool.query(
-            'UPDATE students SET roll_no = ?, name = ?, department = ?, year = ? WHERE id = ?',
-            [roll_no, name, department, year, req.params.id]
+            'UPDATE students SET roll_no = ?, name = ?, department = ?, year = ?, course = ? WHERE id = ?',
+            [roll_no, name, department, year, course, req.params.id]
         );
         res.json({ message: 'Student updated successfully' });
     } catch (error) {

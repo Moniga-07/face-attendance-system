@@ -8,9 +8,7 @@ const UserProfile = () => {
         faculty_name: '',
         faculty_id: '',
         course_name: '',
-        course_code: '',
-        period_slot: '',
-        room_number: ''
+        course_code: ''
     });
     const [loading, setLoading] = useState(true);
 
@@ -27,9 +25,7 @@ const UserProfile = () => {
                         faculty_name: data.faculty_name || '',
                         faculty_id: data.faculty_id || '',
                         course_name: data.course_name || '',
-                        course_code: data.course_code || '',
-                        period_slot: data.period_slot || '',
-                        room_number: data.room_number || ''
+                        course_code: data.course_code || ''
                     });
                 }
             } catch (error) {
@@ -72,7 +68,7 @@ const UserProfile = () => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-slate-600 mb-1">Faculty Name</label>
+                            <label className="block text-sm font-bold text-slate-900 mb-1">Faculty Name</label>
                             <input 
                                 className="w-full p-3 border rounded-xl outline-none focus:border-blue-500" 
                                 value={formData.faculty_name} 
@@ -81,7 +77,7 @@ const UserProfile = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-600 mb-1">Faculty ID</label>
+                            <label className="block text-sm font-bold text-slate-900 mb-1">Faculty ID</label>
                             <input 
                                 className="w-full p-3 border rounded-xl outline-none focus:border-blue-500" 
                                 value={formData.faculty_id} 
@@ -90,7 +86,7 @@ const UserProfile = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-600 mb-1">Default Course Name</label>
+                            <label className="block text-sm font-bold text-slate-900 mb-1">Default Course Name</label>
                             <input 
                                 className="w-full p-3 border rounded-xl outline-none focus:border-blue-500" 
                                 value={formData.course_name} 
@@ -99,7 +95,7 @@ const UserProfile = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-600 mb-1">Default Course Code</label>
+                            <label className="block text-sm font-bold text-slate-900 mb-1">Default Course Code</label>
                             <input 
                                 className="w-full p-3 border rounded-xl outline-none focus:border-blue-500" 
                                 value={formData.course_code} 
@@ -107,24 +103,7 @@ const UserProfile = () => {
                                 placeholder="E.g. ITA0218" 
                             />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-600 mb-1">Period / Slot</label>
-                            <input 
-                                className="w-full p-3 border rounded-xl outline-none focus:border-blue-500" 
-                                value={formData.period_slot} 
-                                onChange={e => setFormData({...formData, period_slot: e.target.value})} 
-                                placeholder="E.g. Morning / Slot A1" 
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-600 mb-1">Room Number</label>
-                            <input 
-                                className="w-full p-3 border rounded-xl outline-none focus:border-blue-500" 
-                                value={formData.room_number} 
-                                onChange={e => setFormData({...formData, room_number: e.target.value})} 
-                                placeholder="E.g. Room 405" 
-                            />
-                        </div>
+
                     </div>
                     
                     <button type="submit" className="w-full py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium transition-colors">

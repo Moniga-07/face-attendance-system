@@ -43,6 +43,7 @@ const RegisterStudent = () => {
             .then((currentStream) => {
                 if (videoRef.current) {
                     videoRef.current.srcObject = currentStream;
+                    videoRef.current.play().catch(e => console.error("Play error:", e));
                 }
             })
             .catch((err) => {
@@ -142,7 +143,7 @@ const RegisterStudent = () => {
                 <div className="glass p-6 rounded-2xl">
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1">Roll Number</label>
+                            <label className="block text-sm font-bold text-slate-900 mb-1">Roll Number</label>
                             <input
                                 type="text"
                                 required
@@ -152,7 +153,7 @@ const RegisterStudent = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1">Full Name</label>
+                            <label className="block text-sm font-bold text-slate-900 mb-1">Full Name</label>
                             <input
                                 type="text"
                                 required
@@ -162,7 +163,7 @@ const RegisterStudent = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1">Department</label>
+                            <label className="block text-sm font-bold text-slate-900 mb-1">Department</label>
                             <input
                                 type="text"
                                 required
@@ -172,7 +173,7 @@ const RegisterStudent = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1">Year</label>
+                            <label className="block text-sm font-bold text-slate-900 mb-1">Year</label>
                             <select
                                 required
                                 value={formData.year}
@@ -187,7 +188,7 @@ const RegisterStudent = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1">Course</label>
+                            <label className="block text-sm font-bold text-slate-900 mb-1">Course</label>
                             <select
                                 required
                                 value={formData.course}
@@ -238,6 +239,7 @@ const RegisterStudent = () => {
                                     ref={videoRef} 
                                     autoPlay 
                                     muted 
+                                    playsInline
                                     className="absolute inset-0 w-full h-full object-cover"
                                 />
                                 {capturing && (

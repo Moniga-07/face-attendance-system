@@ -13,7 +13,8 @@ const LiveAttendance = () => {
     const [faceMatcher, setFaceMatcher] = useState<faceapi.FaceMatcher | null>(null);
     const [studentMap, setStudentMap] = useState<Map<string, any>>(new Map());
     const [subjects, setSubjects] = useState<any[]>([]);
-    const [selectedSubject, setSelectedSubject] = useState<string>('');
+    const [courseCode, setCourseCode] = useState<string>('');
+    const [periodSlot, setPeriodSlot] = useState<string>('');
     const [profile, setProfile] = useState<any>(null);
     
     // Cooldown to prevent spamming backend for the same person
@@ -63,7 +64,7 @@ const LiveAttendance = () => {
                         });
                         setProfile(profRes.data);
                         if (profRes.data && profRes.data.course_code) {
-                            setSelectedSubject(profRes.data.course_code);
+                            setCourseCode(profRes.data.course_code);
                         }
                     } catch (e) {
                         console.log('No profile defaults found or error fetching profile');
@@ -80,12 +81,13 @@ const LiveAttendance = () => {
 
     useEffect(() => {
         let stream: MediaStream | null = null;
-        if (modelsLoaded && studentsLoaded && selectedSubject) {
+        if (modelsLoaded && studentsLoaded && courseCode !== '' && periodSlot !== '') {
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then((currentStream) => {
                     stream = currentStream;
                     if (videoRef.current) {
                         videoRef.current.srcObject = stream;
+                        videoRef.current.play().catch(e => console.error("Play error:", e));
                     }
                 })
                 .catch(err => {
@@ -102,7 +104,7 @@ const LiveAttendance = () => {
                 clearInterval(recognitionLoopRef.current);
             }
         };
-    }, [modelsLoaded, studentsLoaded, selectedSubject]);
+    }, [modelsLoaded, studentsLoaded, courseCode, periodSlot]);
 
     const handleVideoPlay = () => {
         if (!videoRef.current || !canvasRef.current || !faceMatcher) return;
@@ -154,7 +156,9 @@ const LiveAttendance = () => {
                             try {
                                 await axios.post('http://localhost:5000/api/attendance', {
                                     student_id: bestMatch.label,
-                                    subject_id: selectedSubject,
+                                    subject_id: null,
+                                    course_code: courseCode,
+                                    period_slot: periodSlot,
                                     attendance_date,
                                     attendance_time
                                 });
@@ -170,7 +174,7 @@ const LiveAttendance = () => {
                                 if (error.response?.status === 400 && error.response?.data?.message.includes('already marked')) {
                                     toast.success(
                                         <div className="flex flex-col">
-                                            <span className="font-bold text-green-400">Attendance already marked for today</span>
+                                            <span className="font-bold text-green-400">Attendance already marked for this slot</span>
                                             <span>{student.name}</span>
                                         </div>,
                                         { 
@@ -211,25 +215,41 @@ const LiveAttendance = () => {
                 <h1 className="text-3xl font-bold text-slate-100 mb-2">Live Attendance Scanner</h1>
                 <p className="text-slate-400 mb-6">Please look directly at the camera</p>
 
-                {subjects.length > 0 && !profile?.course_code && (
-                    <div className="mb-6 w-full max-w-md">
-                        <label className="block text-sm font-medium text-slate-300 mb-2 text-center">Select Subject</label>
+                <div className="mb-6 w-full max-w-2xl flex gap-4">
+                    <div className="flex-1">
+                        <label className="block text-sm font-bold text-slate-900 mb-2 text-center">Course Code</label>
                         <select 
                             className="w-full p-3 bg-slate-800 text-slate-100 border border-slate-700 rounded-xl outline-none focus:border-blue-500"
-                            value={selectedSubject}
-                            onChange={(e) => setSelectedSubject(e.target.value)}
+                            value={courseCode}
+                            onChange={(e) => setCourseCode(e.target.value)}
                         >
-                            <option value="">-- Choose Subject --</option>
-                            {subjects.map(s => (
-                                <option key={s.id} value={s.id}>{s.name} ({s.subject_code})</option>
-                            ))}
+                            <option value="">-- Choose Course --</option>
+                            <option value="ITA0218 - Web technology">ITA0218 - Web technology</option>
+                            <option value="CSE1001 - Programming">CSE1001 - Programming</option>
+                            <option value="ECE2002 - Digital Logic">ECE2002 - Digital Logic</option>
+                            <option value="MGT101 - Management">MGT101 - Management</option>
+                            <option value="ENG101 - English">ENG101 - English</option>
                         </select>
                     </div>
-                )}
+                    <div className="flex-1">
+                        <label className="block text-sm font-bold text-slate-900 mb-2 text-center">Period / Slot</label>
+                        <select 
+                            className="w-full p-3 bg-slate-800 text-slate-100 border border-slate-700 rounded-xl outline-none focus:border-blue-500"
+                            value={periodSlot}
+                            onChange={(e) => setPeriodSlot(e.target.value)}
+                        >
+                            <option value="">-- Choose Slot --</option>
+                            <option value="08:00 AM - 10:00 AM">08:00 AM - 10:00 AM</option>
+                            <option value="10:00 AM - 12:00 PM">10:00 AM - 12:00 PM</option>
+                            <option value="12:00 PM - 03:00 PM">12:00 PM - 03:00 PM</option>
+                            <option value="03:00 PM - 04:00 PM">03:00 PM - 04:00 PM</option>
+                        </select>
+                    </div>
+                </div>
 
-                {(!selectedSubject && subjects.length > 0) ? (
+                {(courseCode === '' || periodSlot === '') ? (
                     <div className="w-full aspect-video bg-slate-800/50 rounded-2xl flex flex-col items-center justify-center text-slate-400 border border-slate-700 shadow-inner">
-                        <p className="text-lg font-medium text-slate-300">Please select a subject to start camera</p>
+                        <p className="text-lg font-medium text-slate-300">Please select Course Code and Period/Slot to start camera</p>
                     </div>
                 ) : (!modelsLoaded || !studentsLoaded) ? (
                     <div className="w-full aspect-video bg-slate-800/50 rounded-2xl flex flex-col items-center justify-center text-slate-400 border border-slate-700 shadow-inner">
@@ -245,6 +265,7 @@ const LiveAttendance = () => {
                             onPlay={handleVideoPlay}
                             autoPlay 
                             muted 
+                            playsInline
                             className="absolute inset-0 w-full h-full object-cover transform scale-x-[-1]"
                             style={{ filter: 'brightness(1.05)' }}
                         />

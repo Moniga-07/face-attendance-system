@@ -57,7 +57,7 @@ const Login = () => {
 
                 <form onSubmit={handleLogin} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Username</label>
+                        <label className="block text-sm font-bold text-slate-900 mb-2">Username</label>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <User size={18} className="text-slate-500" />
@@ -73,7 +73,7 @@ const Login = () => {
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Password</label>
+                        <label className="block text-sm font-bold text-slate-900 mb-2">Password</label>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <Lock size={18} className="text-slate-500" />
